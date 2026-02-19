@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Stock Price Prediction - Stock Price Prediction{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Stock Price Prediction</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Input Section -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-sliders"></i> Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="stockSymbol" class="form-label">Stock Symbol</label>
+                        <select class="form-select" id="stockSymbol">
+                            <option value="">Select a stock...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="predictionDays" class="form-label">Days to Predict (1-30)</label>
+                        <input type="range" class="form-range" id="predictionDays" min="1" max="30" value="7">
+                        <div class="text-muted small">
+                            <span id="daysValue">7</span> days
+                        </div>
+                    </div>
+
+                    <button id="predictBtn" class="btn btn-primary w-100 mb-3" onclick="makePrediction()">
+                        <i class="bi bi-play-circle"></i> Predict
+                    </button>
+
+                    <div id="loadingSpinner" class="spinner-border text-primary w-100 d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-download"></i> Export</h5>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-sm btn-outline-primary w-100 mb-2" onclick="exportChart('png')">
+                        <i class="bi bi-image"></i> Export as PNG
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary w-100" onclick="exportChart('pdf')">
+                        <i class="bi bi-file-pdf"></i> Export as PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="col-lg-9">
+            <!-- Prediction Chart -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Price Prediction Chart</h5>
+                </div>
+                <div class="card-body">
+                    <div id="predictionChart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- Metrics Comparison -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Model Metrics Comparison</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="metricsContainer">
+                        <!-- Metrics will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Predictions Comparison -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Model Predictions Comparison</h5>
+                </div>
+                <div class="card-body">
+                    <div id="comparisonChart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentChartData = null;
+    let selectedSymbol = null;
+
+    // Load stock symbols on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadStockSymbols();
+        setupRangeInput();
+    });
+
+    function setupRangeInput() {
+        const rangeInput = document.getElementById('predictionDays');
+        const daysValue = document.getElementById('daysValue');
+        
+        rangeInput.addEventListener('input', (e) => {
+            daysValue.textContent = e.target.value;
+        });
+    }
+
+    async function loadStockSymbols() {
+        try {
+            const response = await fetch('{{ url_for("get_stock_symbols") }}');
+            const data = await response.json();
+            
+            const select = document.getElementById('stockSymbol');
+            data.symbols.forEach(symbol => {
+                const option = document.createElement('option');
+                option.value = symbol;
+                option.textContent = symbol;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading symbols:', error);
+        }
+    }
+
+    async function makePrediction() {
+        const symbol = document.getElementById('stockSymbol').value;
+        const days = document.getElementById('predictionDays').value;
+        
+        if (!symbol) {
+            alert('Please select a stock symbol');
+            return;
+        }
+
+        selectedSymbol = symbol;
+        
+        // Show loading
+        document.getElementById('predictBtn').disabled = true;
+        document.getElementById('loadingSpinner').classList.remove('d-none');
+        
+        try {
+            const response = await fetch('{{ url_for("prediction") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ symbol, days: parseInt(days) })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                currentChartData = data;
+                displayResults(data, symbol, days);
+            } else {
+                alert(data.message || 'Prediction failed');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            document.getElementById('predictBtn').disabled = false;
+            document.getElementById('loadingSpinner').classList.add('d-none');
+        }
+    }
+
+    function displayResults(data, symbol, days) {
+        displayPredictionChart(data, symbol);
+        displayMetrics(data.metrics);
+        displayComparison(data.comparison);
+    }
+
+    function displayPredictionChart(data, symbol) {
+        const predictions = data.predictions.lstm || data.predictions.linear;
+        const days = predictions.length;
+        
+        const xAxis = Array.from({length: days}, (_, i) => `Day ${i + 1}`);
+        
+        const trace1 = {
+            x: xAxis,
+            y: predictions,
+            name: 'LSTM Prediction',
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: {color: 'rgb(31, 119, 180)', width: 2}
+        };
+        
+        const layout = {
+            title: `${symbol} Stock Price Prediction (Next ${days} Days)`,
+            xaxis: {title: 'Days'},
+            yaxis: {title: 'Price (USD)'},
+            hovermode: 'x unified',
+            responsive: true
+        };
+        
+        Plotly.newPlot('predictionChart', [trace1], layout, {responsive: true});
+    }
+
+    function displayMetrics(metrics) {
+        const container = document.getElementById('metricsContainer');
+        container.innerHTML = '';
+        
+        for (const [model, values] of Object.entries(metrics)) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6 mb-3';
+            col.innerHTML = `
+                <div class="metric-card">
+                    <h6>${model}</h6>
+                    <div class="metric-row">
+                        <span>RMSE:</span>
+                        <strong>${values.RMSE}</strong>
+                    </div>
+                    <div class="metric-row">
+                        <span>MAE:</span>
+                        <strong>${values.MAE}</strong>
+                    </div>
+                </div>
+            `;
+            container.appendChild(col);
+        }
+    }
+
+    function displayComparison(comparison) {
+        const days = Math.max(...Object.values(comparison).map(p => p.length)) || 10;
+        const xAxis = Array.from({length: days}, (_, i) => `Day ${i + 1}`);
+        
+        const traces = Object.entries(comparison).map(([model, predictions]) => ({
+            x: xAxis,
+            y: predictions,
+            name: model,
+            type: 'scatter',
+            mode: 'lines+markers'
+        }));
+        
+        const layout = {
+            title: 'Model Predictions Comparison',
+            xaxis: {title: 'Days'},
+            yaxis: {title: 'Price (USD)'},
+            hovermode: 'x unified',
+            responsive: true
+        };
+        
+        Plotly.newPlot('comparisonChart', traces, layout, {responsive: true});
+    }
+
+    function exportChart(format) {
+        if (!currentChartData) {
+            alert('Please make a prediction first');
+            return;
+        }
+        
+        // TODO: Implement export functionality
+        alert(`Export to ${format.toUpperCase()} coming soon!`);
+    }
+</script>
+{% endblock %}

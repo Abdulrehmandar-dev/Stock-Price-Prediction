@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Download Stock Data - Stock Price Prediction{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Download Stock Data</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-download"></i> Export Historical Data</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label for="downloadSymbol" class="form-label">Select Stock Symbol</label>
+                        <select class="form-select" id="downloadSymbol">
+                            <option value="">Choose a stock...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="downloadDays" class="form-label">Date Range (Days)</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <select class="form-select" id="downloadDays">
+                                    <option value="30">Last 30 days</option>
+                                    <option value="90">Last 90 days</option>
+                                    <option value="180">Last 6 months</option>
+                                    <option value="365">Last 1 year</option>
+                                    <option value="730">Last 2 years</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success btn-lg" onclick="downloadData()">
+                            <i class="bi bi-download"></i> Download as CSV
+                        </button>
+                    </div>
+
+                    <div id="downloadStatus" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Data Preview -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-table"></i> Data Preview</h5>
+                </div>
+                <div class="card-body">
+                    <div id="dataPreview" class="table-responsive">
+                        <p class="text-muted">Select a stock and click download to see preview</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Sidebar -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> About Data Export</h5>
+                </div>
+                <div class="card-body">
+                    <h6>What's included:</h6>
+                    <ul>
+                        <li>Opening price</li>
+                        <li>Closing price</li>
+                        <li>Highest price</li>
+                        <li>Lowest price</li>
+                        <li>Trading volume</li>
+                        <li>Adjusted close</li>
+                    </ul>
+
+                    <hr>
+
+                    <h6>Export Format:</h6>
+                    <p>CSV (Comma Separated Values)</p>
+
+                    <hr>
+
+                    <h6>Data Source:</h6>
+                    <p>Yahoo Finance API</p>
+
+                    <hr>
+
+                    <h6>Usage Tips:</h6>
+                    <ul class="small">
+                        <li>Use downloaded data for personal analysis</li>
+                        <li>Import to Excel or other tools</li>
+                        <li>Train custom ML models</li>
+                        <li>Verify predictions manually</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Load stock symbols
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('{{ url_for("get_stock_symbols") }}');
+            const data = await response.json();
+            
+            const select = document.getElementById('downloadSymbol');
+            data.symbols.forEach(symbol => {
+                const option = document.createElement('option');
+                option.value = symbol;
+                option.textContent = symbol;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading symbols:', error);
+        }
+    });
+
+    async function downloadData() {
+        const symbol = document.getElementById('downloadSymbol').value;
+        const days = document.getElementById('downloadDays').value;
+        const statusDiv = document.getElementById('downloadStatus');
+        
+        if (!symbol) {
+            statusDiv.innerHTML = '<div class="alert alert-warning">Please select a stock symbol</div>';
+            return;
+        }
+        
+        statusDiv.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+        
+        try {
+            const response = await fetch('{{ url_for("download_data") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ symbol, days: parseInt(days) })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                statusDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> Data downloaded successfully!</div>';
+                displayDataPreview(data.data);
+                triggerDownload(symbol, data.data);
+            } else {
+                statusDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            }
+        } catch (error) {
+            statusDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        }
+    }
+
+    function displayDataPreview(data) {
+        const preview = document.getElementById('dataPreview');
+        if (!data || data.length === 0) {
+            preview.innerHTML = '<p class="text-muted">No data available</p>';
+            return;
+        }
+        
+        let html = '<table class="table table-sm table-striped"><thead><tr>';
+        Object.keys(data[0]).forEach(key => {
+            html += `<th>${key}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        
+        data.slice(0, 10).forEach(row => {
+            html += '<tr>';
+            Object.values(row).forEach(val => {
+                html += `<td>${val}</td>`;
+            });
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table>';
+        preview.innerHTML = html;
+    }
+
+    function triggerDownload(symbol, data) {
+        let csv = '';
+        
+        if (data.length > 0) {
+            csv = Object.keys(data[0]).join(',') + '\n';
+            data.forEach(row => {
+                csv += Object.values(row).map(v => `"${v}"`).join(',') + '\n';
+            });
+        }
+        
+        const blob = new Blob([csv], {type: 'text/csv'});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${symbol}_data_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}About - Stock Price Prediction{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">About Stock Price Prediction</h2>
+        </div>
+    </div>
+
+    <!-- Project Overview -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="bi bi-info-circle"></i> Project Overview</h4>
+                    <p>Stock Price Prediction is an advanced machine learning application designed to help investors and traders forecast stock prices using multiple prediction models. Our platform combines state-of-the-art deep learning techniques with traditional statistical methods to provide comprehensive price predictions.</p>
+                    <p>We leverage real-time data from Yahoo Finance and apply sophisticated algorithms to identify patterns and trends in historical stock data, enabling users to make more informed investment decisions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h4 class="mb-4">Key Features</h4>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon bg-primary">
+                    <i class="bi bi-braces"></i>
+                </div>
+                <h5>4 ML Models</h5>
+                <p>LSTM, Linear Regression, Random Forest, and ARIMA for diverse prediction perspectives</p>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon bg-success">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h5>Secure Authentication</h5>
+                <p>User accounts with secure login, signup, and password recovery</p>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon bg-info">
+                    <i class="bi bi-download"></i>
+                </div>
+                <h5>Data Export</h5>
+                <p>Download historical data as CSV and export charts as images or PDF</p>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon bg-warning">
+                    <i class="bi bi-chat-dots"></i>
+                </div>
+                <h5>AI Chatbot</h5>
+                <p>24/7 assistant to answer questions about predictions and stocks</p>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon bg-danger">
+                    <i class="bi bi-moon-stars"></i>
+                </div>
+                <h5>Theme Toggle</h5>
+                <p>Switch between light and dark themes for comfortable viewing</p>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon bg-secondary">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <h5>Interactive Charts</h5>
+                <p>Beautiful Plotly charts for visualizing predictions and comparisons</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technologies -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h4 class="mb-4">Technologies Used</h4>
+        </div>
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-gear"></i> Backend</h6>
+                            <ul>
+                                <li>Python</li>
+                                <li>Flask Web Framework</li>
+                                <li>SQLAlchemy ORM</li>
+                                <li>Flask-Login</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-cpu"></i> Machine Learning</h6>
+                            <ul>
+                                <li>TensorFlow & Keras</li>
+                                <li>Scikit-Learn</li>
+                                <li>Numpy & Pandas</li>
+                                <li>StatsModels</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-palette"></i> Frontend</h6>
+                            <ul>
+                                <li>HTML5 & CSS3</li>
+                                <li>Bootstrap 5</li>
+                                <li>JavaScript (Vanilla)</li>
+                                <li>Plotly.js</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-database"></i> Data & APIs</h6>
+                            <ul>
+                                <li>SQLite Database</li>
+                                <li>Yahoo Finance API</li>
+                                <li>RESTful APIs</li>
+                                <li>JSON</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Models Explanation -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h4 class="mb-4">Machine Learning Models</h4>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">LSTM (Long Short-Term Memory)</h5>
+                </div>
+                <div class="card-body">
+                    <p>Deep learning model designed for time series analysis. Captures long-term dependencies in stock price patterns.</p>
+                    <strong>Best for:</strong> Complex patterns, long-term trends
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Linear Regression</h5>
+                </div>
+                <div class="card-body">
+                    <p>Simple statistical model that finds linear relationships between features and prices.</p>
+                    <strong>Best for:</strong> Stable trends, baseline comparison
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Random Forest</h5>
+                </div>
+                <div class="card-body">
+                    <p>Ensemble learning method combining multiple decision trees for robust predictions.</p>
+                    <strong>Best for:</strong> Handling non-linear relationships, feature importance
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">ARIMA</h5>
+                </div>
+                <div class="card-body">
+                    <p>Statistical model for time series forecasting using autoregressive methods.</p>
+                    <strong>Best for:</strong> Seasonal patterns, statistical forecasting
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+                <h5 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Important Disclaimer</h5>
+                <p>This application is provided for educational and research purposes only. It is not financial advice. Stock prices are influenced by numerous unpredictable factors including market sentiment, economic news, and geopolitical events. Predictions from this application should not be relied upon for making investment decisions. Always consult with a qualified financial advisor before making any investment decisions.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

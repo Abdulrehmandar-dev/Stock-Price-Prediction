@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Stock Price Prediction{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient border-0 shadow-sm">
+                <div class="card-body text-light">
+                    <h1 class="h3">Welcome, {{ username }}! 👋</h1>
+                    <p class="mb-0">Track stock predictions and analyze market trends with our advanced ML models.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-primary">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-0">Total Predictions</h6>
+                            <h3 class="mb-0">{{ predictions_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-success">
+                            <i class="bi bi-download"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-0">Last Prediction</h6>
+                            <h3 class="mb-0">{{ last_prediction or 'None' }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-info">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-0">Models</h6>
+                            <h3 class="mb-0">4</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon bg-warning">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="text-muted mb-0">AI Assistant</h6>
+                            <h3 class="mb-0">Ready</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="action-card h-100">
+                <div class="action-icon bg-primary bg-opacity-10">
+                    <i class="bi bi-crystal-ball text-primary"></i>
+                </div>
+                <h5>Start Prediction</h5>
+                <p class="text-muted">Predict stock prices using LSTM, Linear Regression, Random Forest, and ARIMA models</p>
+                <a href="{{ url_for('prediction') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-arrow-right"></i> Start Now
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="action-card h-100">
+                <div class="action-icon bg-success bg-opacity-10">
+                    <i class="bi bi-download text-success"></i>
+                </div>
+                <h5>Download Stock Data</h5>
+                <p class="text-muted">Export historical stock data for any company in CSV format</p>
+                <a href="{{ url_for('download_data') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-arrow-right"></i> Download
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="action-card h-100">
+                <div class="action-icon bg-info bg-opacity-10">
+                    <i class="bi bi-chat-dots text-info"></i>
+                </div>
+                <h5>Chatbot Assistant</h5>
+                <p class="text-muted">Get instant answers about stocks, predictions, and how to use our platform</p>
+                <button onclick="toggleChatbot()" class="btn btn-info btn-sm">
+                    <i class="bi bi-arrow-right"></i> Chat Now
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="action-card h-100">
+                <div class="action-icon bg-warning bg-opacity-10">
+                    <i class="bi bi-question-circle text-warning"></i>
+                </div>
+                <h5>FAQs</h5>
+                <p class="text-muted">Find answers to common questions about stock prediction and our models</p>
+                <a href="{{ url_for('faqs') }}" class="btn btn-warning btn-sm">
+                    <i class="bi bi-arrow-right"></i> View FAQs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="mb-4">Platform Features</h4>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="feature-item">
+                <i class="bi bi-check-circle text-success"></i>
+                <span>4 Advanced ML Models</span>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="feature-item">
+                <i class="bi bi-check-circle text-success"></i>
+                <span>Real-time Stock Data</span>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="feature-item">
+                <i class="bi bi-check-circle text-success"></i>
+                <span>Export to CSV/PDF</span>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="feature-item">
+                <i class="bi bi-check-circle text-success"></i>
+                <span>Secure Authentication</span>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="feature-item">
+                <i class="bi bi-check-circle text-success"></i>
+                <span>Dark/Light Theme</span>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="feature-item">
+                <i class="bi bi-check-circle text-success"></i>
+                <span>AI Chat Assistant</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

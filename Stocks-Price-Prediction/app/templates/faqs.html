@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}FAQs - Stock Price Prediction{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Frequently Asked Questions</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="accordion" id="faqAccordion">
+                {% if faqs %}
+                    {% for faq in faqs %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button {% if loop.first %}{% else %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ loop.index }}">
+                                {{ faq.question }}
+                            </button>
+                        </h2>
+                        <div id="faq{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                {{ faq.answer }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No FAQs available at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-lightbulb"></i> Quick Tips</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><strong>Compare Models:</strong> Each model offers different insights. Compare all 4 for best results.</li>
+                        <li class="mb-2"><strong>Check Metrics:</strong> RMSE and MAE show model accuracy. Lower is better.</li>
+                        <li class="mb-2"><strong>Use Recent Data:</strong> Predictions improve with more historical data.</li>
+                        <li class="mb-2"><strong>Export Data:</strong> Download and analyze data in Excel or Python.</li>
+                        <li class="mb-2"><strong>Ask the Chatbot:</strong> Open the chat for quick answers.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-robot"></i> Still Have Questions?</h5>
+                    <p class="card-text">Our AI chatbot is available 24/7 to help you!</p>
+                    <button class="btn btn-primary w-100" onclick="toggleChatbot()">
+                        <i class="bi bi-chat-dots"></i> Open Chatbot
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
