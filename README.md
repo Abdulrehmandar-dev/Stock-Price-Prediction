@@ -25,7 +25,9 @@ This project is developed for learning, experimentation, and portfolio demonstra
 * Database: Flask-SQLAlchemy
 * Frontend: HTML, CSS, JavaScript
 * Visualization: Interactive charts and graphs
-   License
+
+ License
 -->This project is licensed under the MIT License.
-  Support
+ 
+ Support
 -->If you find this project helpful, feel free to star the repository or contribute.
